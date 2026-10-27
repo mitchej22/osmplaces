@@ -1,0 +1,350 @@
+# osmsdoh SDOH Place-Type Taxonomy — installed runtime copy
+# Maintained by data-raw/build_taxonomy.R. Do not edit directly.
+# Edit data-raw/taxonomy.yaml and run data-raw/build_taxonomy.R instead.
+
+version: "0.1.0"
+
+place_types:
+
+  - label: grocery
+    description: "Grocery stores, supermarkets, and food retail outlets"
+    sdoh_domain: food_environment
+    version: "0.1.0"
+    geometry_types: [node, way, relation]
+    tag_specs:
+      - key: shop
+        value: [supermarket, greengrocer, health_food, organic]
+        exclude:
+          - key: disused
+            value: "yes"
+      - key: amenity
+        value: [marketplace]
+        exclude: []
+    notes: >
+      Marketplaces are included cautiously; many are not food sources.
+      Consider filtering by marketplace:type if more precision is needed.
+      Does not overlap with convenience_store.
+    aliases: [supermarket, food_retail]
+    source: built-in
+
+  - label: convenience_store
+    description: "Small convenience and corner stores"
+    sdoh_domain: food_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: shop
+        value: [convenience]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: >
+      Distinct from grocery (supermarkets). Included as a food access measure
+      but often used as a proxy for unhealthy food environments.
+    aliases: [corner_store]
+    source: built-in
+
+  - label: pharmacy
+    description: "Retail pharmacies and dispensaries"
+    sdoh_domain: health_services
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [pharmacy]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: >
+      NOTE: amenity=pharmacy also appears in the healthcare type definition.
+      Cross-type deduplication policy is an open architectural decision.
+      See docs/architecture.md Section 10, Decision #1.
+    aliases: []
+    source: built-in
+
+  - label: healthcare
+    description: "Hospitals, clinics, and primary care providers"
+    sdoh_domain: health_services
+    version: "0.1.0"
+    geometry_types: [node, way, relation]
+    tag_specs:
+      - key: amenity
+        value: [hospital, clinic, doctors, dentist]
+        exclude:
+          - key: disused
+            value: "yes"
+      - key: healthcare
+        value: [hospital, clinic, doctor, dentist]
+        exclude: []
+    notes: >
+      Intentionally excludes amenity=pharmacy (see pharmacy type).
+      The amenity= and healthcare= keys are both in active OSM use and
+      capture overlapping but distinct sets of features.
+    aliases: [health_facility, medical]
+    source: built-in
+
+  - label: childcare
+    description: "Licensed childcare centers, nurseries, and kindergartens"
+    sdoh_domain: child_development
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [childcare, kindergarten, nursery]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: []
+    source: built-in
+
+  - label: education
+    description: "Schools, colleges, and universities"
+    sdoh_domain: child_development
+    version: "0.1.0"
+    geometry_types: [node, way, relation]
+    tag_specs:
+      - key: amenity
+        value: [school, college, university]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: [school]
+    source: built-in
+
+  - label: parks_greenspace
+    description: "Parks, gardens, and nature reserves"
+    sdoh_domain: physical_activity
+    version: "0.1.0"
+    geometry_types: [node, way, relation]
+    tag_specs:
+      - key: leisure
+        value: [park, garden, nature_reserve]
+        exclude: []
+      - key: landuse
+        value: [recreation_ground]
+        exclude: []
+    notes: >
+      landuse=recreation_ground overlaps with play_child type.
+      Cross-type deduplication is an open decision (see architecture.md).
+    aliases: [park, greenspace, green_space]
+    source: built-in
+
+  - label: play_child
+    description: "Playgrounds and child-oriented recreation spaces"
+    sdoh_domain: child_development
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: leisure
+        value: [playground]
+        exclude: []
+    notes: >
+      KNOWN ISSUE in prototype: leisure=pitch and leisure=track were included
+      but are general adult sports facilities, not child-specific.
+      Removed from this version pending scientific review.
+      leisure=recreation_ground overlaps with parks_greenspace.
+    aliases: [playground]
+    source: built-in
+
+  - label: fitness
+    description: "Fitness centers and outdoor fitness stations"
+    sdoh_domain: physical_activity
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: leisure
+        value: [fitness_centre]
+        exclude: []
+      - key: amenity
+        value: [fitness_station]
+        exclude: []
+    notes: ""
+    aliases: [gym, fitness_center]
+    source: built-in
+
+  - label: fast_food
+    description: "Fast food restaurants and food courts"
+    sdoh_domain: food_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [fast_food, food_court]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: []
+    source: built-in
+
+  - label: restaurant_cafe
+    description: "Sit-down restaurants and cafes"
+    sdoh_domain: food_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [restaurant, cafe]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: [restaurant, cafe]
+    source: built-in
+
+  - label: social_services
+    description: "Social service facilities and community support organizations"
+    sdoh_domain: social_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [social_facility]
+        exclude: []
+    notes: >
+      OSM's amenity=social_facility covers a wide range of facility types.
+      The social_facility:for tag can be used for finer classification.
+    aliases: []
+    source: built-in
+
+  - label: transit
+    description: "Public transit stops and stations"
+    sdoh_domain: transportation
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: highway
+        value: [bus_stop]
+        exclude: []
+      - key: railway
+        value: [station, tram_stop]
+        exclude: []
+      - key: public_transport
+        value: [stop_position, platform, station]
+        exclude: []
+    notes: >
+      KNOWN ISSUE: This type mixes bus stops (hundreds per city) and transit
+      stations (few per city) at very different spatial scales. Consider
+      splitting into transit_stop and transit_station in a future version.
+      public_transport=stop_position may duplicate highway=bus_stop nodes.
+    aliases: [transit_stop, bus_stop]
+    source: built-in
+
+  - label: financial_mainstream
+    description: "Banks and ATMs"
+    sdoh_domain: economic_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [bank, atm]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: [bank]
+    source: built-in
+
+  - label: financial_predatory
+    description: "Predatory financial services (payday lenders, pawnbrokers, check cashers)"
+    sdoh_domain: economic_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [money_lender]
+        exclude: []
+      - key: shop
+        value: [pawnbroker]
+        exclude: []
+    notes: >
+      KNOWN ISSUE: shop=cheque_cashing from prototype has very low OSM usage
+      globally. Removed pending review of actual tag prevalence.
+      amenity=money_lender and shop=pawnbroker are better supported.
+    aliases: [payday_loan, pawnbroker]
+    source: built-in
+
+  - label: alcohol_retail
+    description: "Alcohol retail stores (off-license)"
+    sdoh_domain: substance_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: shop
+        value: [alcohol]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: [liquor_store, off_licence]
+    source: built-in
+
+  - label: bars_nightlife
+    description: "Bars, pubs, and nightclubs"
+    sdoh_domain: substance_environment
+    version: "0.1.0"
+    geometry_types: [node, way]
+    tag_specs:
+      - key: amenity
+        value: [bar, pub, nightclub]
+        exclude:
+          - key: disused
+            value: "yes"
+    notes: ""
+    aliases: [bar, pub]
+    source: built-in
+
+  - label: cultural_civic
+    description: "Libraries, arts centers, theaters, and museums"
+    sdoh_domain: social_environment
+    version: "0.1.0"
+    geometry_types: [node, way, relation]
+    tag_specs:
+      - key: amenity
+        value: [library, arts_centre, theatre]
+        exclude: []
+      - key: tourism
+        value: [museum]
+        exclude: []
+    notes: ""
+    aliases: [library, museum, arts]
+    source: built-in
+
+  - label: religious
+    description: "Places of worship"
+    sdoh_domain: social_environment
+    version: "0.1.0"
+    geometry_types: [node, way, relation]
+    tag_specs:
+      - key: amenity
+        value: [place_of_worship]
+        exclude: []
+    notes: >
+      KNOWN ISSUE in prototype: amenity=community_centre was included here
+      but is a civic/social resource, not a religious place. Removed.
+      community_centre should be added to social_services or cultural_civic.
+    aliases: [place_of_worship, church]
+    source: built-in
+
+  - label: industrial
+    description: "Industrial land use and manufacturing facilities"
+    sdoh_domain: environmental_burden
+    version: "0.1.0"
+    geometry_types: [way, relation]
+    tag_specs:
+      - key: landuse
+        value: [industrial]
+        exclude: []
+      - key: man_made
+        value: [works]
+        exclude: []
+    notes: >
+      Industrial is an area-based environmental exposure, not a point-of-service
+      place type. It has a different analytical role than other types (e.g.,
+      area covered rather than count). Aggregation behavior should be reviewed
+      before use in research. Returns polygons by default (geometry="original"
+      is more meaningful than geometry="point" for this type).
+    aliases: [industry]
+    source: built-in

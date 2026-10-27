@@ -1,0 +1,29 @@
+Package: osmplaces
+Title: Aggregate OpenStreetMap Place Counts for Census Geographies
+Version: 0.0.0.9000
+Authors@R: 
+    person("First", "Last", , "you@example.com", role = c("aut", "cre"))
+Description: Counts OpenStreetMap places (grocery stores, pharmacies, parks,
+    and other social-determinants-of-health place types defined in a
+    taxonomy) within census tracts, block groups, or ZIP code tabulation
+    areas using the ohsome API, for a chosen date.
+Depends: 
+    R (>= 4.0.0)
+Imports: 
+    httr2 (>= 1.0.0),
+    jsonlite,
+    sf,
+    stats,
+    tigris,
+    utils,
+    yaml
+Suggests: 
+    accessibility,
+    ggplot2,
+    htmlwidgets,
+    leaflet,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
