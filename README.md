@@ -40,6 +40,34 @@ built-in options, but providers set their own terms, and some block embedded
 viewers: OpenStreetMap tiles are refused when no referrer is sent, and CARTO
 basemaps now require a key. Use `basemap = "none"` if tiles fail to load.
 
+## Taxonomy
+
+The bundled taxonomy is exposed by `places_taxonomy()` and covers the following
+place types:
+
+| label | domain | description | aliases |
+| --- | --- | --- | --- |
+| `grocery` | `food_environment` | Grocery stores, supermarkets, and food retail outlets | `supermarket`, `food_retail` |
+| `convenience_store` | `food_environment` | Small convenience and corner stores | `corner_store` |
+| `pharmacy` | `health_services` | Retail pharmacies and dispensaries | — |
+| `healthcare` | `health_services` | Hospitals, clinics, and primary care providers | `health_facility`, `medical` |
+| `childcare` | `child_development` | Licensed childcare centers, nurseries, and kindergartens | — |
+| `education` | `child_development` | Schools, colleges, and universities | `school` |
+| `parks_greenspace` | `physical_activity` | Parks, gardens, and nature reserves | `park`, `greenspace`, `green_space` |
+| `play_child` | `child_development` | Playgrounds and child-oriented recreation spaces | `playground` |
+| `fitness` | `physical_activity` | Fitness centers and outdoor fitness stations | `gym`, `fitness_center` |
+| `fast_food` | `food_environment` | Fast food restaurants and food courts | — |
+| `restaurant_cafe` | `food_environment` | Sit-down restaurants and cafes | `restaurant`, `cafe` |
+| `social_services` | `social_environment` | Social service facilities and community support organizations | — |
+| `transit` | `transportation` | Public transit stops and stations | `transit_stop`, `bus_stop` |
+| `financial_mainstream` | `economic_environment` | Banks and ATMs | `bank` |
+| `financial_predatory` | `economic_environment` | Predatory financial services (payday lenders, pawnbrokers, check cashers) | `payday_loan`, `pawnbroker` |
+| `alcohol_retail` | `substance_environment` | Alcohol retail stores (off-license) | `liquor_store`, `off_licence` |
+| `bars_nightlife` | `substance_environment` | Bars, pubs, and nightclubs | `bar`, `pub` |
+| `cultural_civic` | `social_environment` | Libraries, arts centers, theaters, and museums | `library`, `museum`, `arts` |
+| `religious` | `social_environment` | Places of worship | `place_of_worship`, `church` |
+| `industrial` | `environmental_burden` | Industrial land use and manufacturing facilities | `industry` |
+
 ## Accessibility: two-step floating catchment area
 
 `calc_access()` turns counts into scores that account for how many people share
