@@ -39,6 +39,9 @@
 #'   current year.
 #' @param tags `"all"` (default) or a character vector of taxonomy labels or
 #'   aliases, e.g. `c("grocery", "pharmacy", "bank")`.
+#' @param domains Optional character vector of SDOH domain names to include
+#'   place types for, e.g. `c("food_environment", "health_services")`. If
+#'   provided, `tags` is ignored. See [places_taxonomy()] for available domains.
 #' @param geometry If `TRUE`, return an [sf][sf::st_sf] object including the
 #'   boundary polygons.
 #' @param boundary_year Census (TIGER) vintage used for the boundaries. `NULL`
@@ -72,6 +75,12 @@
 #'   bbox = c(-81.75, 41.45, -81.60, 41.55), geography = "tract",
 #'   tags = c("grocery", "pharmacy"), geometry = TRUE
 #' )
+#'
+#' # Filter by domain instead of individual tags
+#' get_places(
+#'   state = "OH", county = "Cuyahoga", year = "2019",
+#'   domains = c("food_environment", "health_services"), geography = "tract"
+#' )
 #' }
 #' @export
 get_places <- function(state = NULL,
@@ -80,6 +89,7 @@ get_places <- function(state = NULL,
                        geography = "block_group",
                        year = NULL,
                        tags = "all",
+                       domains = NULL,
                        geometry = FALSE,
                        boundary_year = NULL,
                        cb = NULL,
@@ -94,7 +104,12 @@ get_places <- function(state = NULL,
   validate_aoi_args(state, county, bbox)
 
   taxonomy <- read_taxonomy()
-  labels <- resolve_tags(tags, taxonomy)
+  
+  if (!is.null(domains)) {
+    labels <- resolve_domains(domains, taxonomy)
+  } else {
+    labels <- resolve_tags(tags, taxonomy)
+  }
 
   if (is.null(boundary_year)) boundary_year <- default_boundary_year(date)
   if (is.null(cb)) cb <- identical(geography, "zip_code")

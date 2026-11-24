@@ -104,6 +104,34 @@ resolve_tags <- function(tags, taxonomy) {
   unique(resolved)
 }
 
+# Resolve domains to unique taxonomy labels.
+resolve_domains <- function(domains, taxonomy) {
+  if (is.null(domains) || !length(domains)) {
+    return(NULL)
+  }
+
+  domains <- as.character(domains)
+  domain_list <- unique(vapply(taxonomy, function(x) x$sdoh_domain, ""))
+  domain_list <- domain_list[nzchar(domain_list)]
+
+  norm <- function(x) tolower(gsub("[ -]+", "_", trimws(x)))
+  norm_domains <- norm(domains)
+  norm_domain_list <- norm(domain_list)
+
+  invalid_domains <- domains[!norm_domains %in% norm_domain_list]
+  if (length(invalid_domains)) {
+    stop("Unknown domain(s): ", paste(shQuote(invalid_domains), collapse = ", "),
+         ". Valid domains are: ", paste(shQuote(domain_list), collapse = ", "),
+         call. = FALSE)
+  }
+
+  labels <- names(taxonomy)
+  matched_labels <- labels[
+    vapply(taxonomy, function(x) norm(x$sdoh_domain), "") %in% norm_domains
+  ]
+  unique(matched_labels)
+}
+
 # Translate one taxonomy entry into an ohsome filter expression, e.g.
 # (type:node or type:way) and ((shop=convenience and not (disused=yes)))
 build_ohsome_filter <- function(place_type) {

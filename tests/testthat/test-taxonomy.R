@@ -20,6 +20,34 @@ test_that("resolve_tags handles all, aliases, case and duplicates", {
   expect_error(resolve_tags(character(0), tx), "at least one")
 })
 
+test_that("resolve_domains resolves domain names to labels", {
+  tx <- read_taxonomy()
+
+  # Single domain
+  labels <- resolve_domains("food_environment", tx)
+  expect_true(all(c("grocery", "convenience_store", "fast_food", "restaurant_cafe") %in% labels))
+  expect_false("pharmacy" %in% labels)
+
+  # Multiple domains
+  labels <- resolve_domains(c("food_environment", "health_services"), tx)
+  expect_true(all(c("grocery", "pharmacy", "healthcare") %in% labels))
+  expect_false("fitness" %in% labels)
+
+  # Case insensitive
+  labels <- resolve_domains("Food_Environment", tx)
+  expect_true("grocery" %in% labels)
+
+  # With underscores and spaces (normalized)
+  labels <- resolve_domains("food environment", tx)
+  expect_true("grocery" %in% labels)
+
+  # Invalid domain
+  expect_error(resolve_domains("invalid_domain", tx), "Unknown domain")
+
+  # NULL domains returns NULL
+  expect_null(resolve_domains(NULL, tx))
+})
+
 test_that("build_ohsome_filter produces ohsome filter expressions", {
   tx <- read_taxonomy()
   expect_equal(
