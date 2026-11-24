@@ -40,6 +40,175 @@ built-in options, but providers set their own terms, and some block embedded
 viewers: OpenStreetMap tiles are refused when no referrer is sent, and CARTO
 basemaps now require a key. Use `basemap = "none"` if tiles fail to load.
 
+## Domain-Based Filtering
+
+Instead of selecting individual place types, you can filter by SDOH (Social
+Determinants of Health) domains. Each domain groups related place types that
+together represent a health-relevant category. This simplifies queries and
+aligns with public health research frameworks.
+
+### Basic Usage: Filter by Domain
+
+```r
+# Get all food environment places (grocery, convenience, fast food, restaurants)
+food_env <- get_places(
+  state = "OH", county = "Cuyahoga", year = 2019,
+  domains = "food_environment", geography = "tract"
+)
+
+# This is equivalent to, but simpler than:
+# get_places(state = "OH", county = "Cuyahoga", year = 2019,
+#   tags = c("grocery", "convenience_store", "fast_food", "restaurant_cafe"),
+#   geography = "tract")
+
+# Get all health services places
+health <- get_places(
+  state = "OH", county = "Cuyahoga", year = 2019,
+  domains = "health_services", geography = "tract"
+)
+```
+
+### Multiple Domains
+
+Combine multiple domains in a single request:
+
+```r
+# Get food and health data together
+food_health <- get_places(
+  state = "OH", county = "Cuyahoga", year = 2019,
+  domains = c("food_environment", "health_services"),
+  geography = "tract", geometry = TRUE
+)
+
+# Result includes columns for all place types in both domains:
+# geoid, geometry, grocery, convenience_store, fast_food, restaurant_cafe,
+# pharmacy, healthcare
+```
+
+### Available Domains
+
+The taxonomy includes 9 SDOH domains:
+
+| Domain | Place Types |
+| --- | --- |
+| `food_environment` | Grocery stores, convenience stores, fast food, restaurants/cafes |
+| `health_services` | Pharmacies, hospitals/clinics |
+| `child_development` | Childcare, schools, playgrounds |
+| `physical_activity` | Parks/greenspace, fitness centers |
+| `social_environment` | Social services, libraries/museums, places of worship |
+| `substance_environment` | Alcohol retail, bars/nightlife |
+| `transportation` | Public transit stops/stations |
+| `economic_environment` | Banks, ATMs, predatory financial services |
+| `environmental_burden` | Industrial facilities |
+
+### Use Cases
+
+#### Use Case 1: Food Access Analysis
+Study food environments across neighborhoods:
+
+```r
+# Get all food-related place types
+food_places <- get_places(
+  state = "CA", county = "Los Angeles",
+  domains = "food_environment",
+  geography = "block_group", geometry = TRUE,
+  year = 2020
+)
+
+# Calculate accessibility with population data
+pop <- data.frame(geoid = acs$GEOID, population = acs$estimate)
+food_access <- calc_access(
+  food_places, population = pop,
+  catchment = 1  # 1-mile radius
+)
+
+# Map the results
+map_places(food_access)
+```
+
+#### Use Case 2: Child Health and Development
+Analyze resources available for children's development:
+
+```r
+# Get childcare, schools, and playgrounds
+child_resources <- get_places(
+  state = "TX", county = "Harris",
+  domains = "child_development",
+  geography = "tract", geometry = TRUE
+)
+
+# View distribution of resources
+head(child_resources)
+# geoid  childcare  education  play_child  geometry
+```
+
+#### Use Case 3: Health Service Disparities
+Compare health service availability across regions:
+
+```r
+# Get pharmacies and healthcare facilities
+health_places <- get_places(
+  bbox = c(-87.5, 41.8, -87.6, 41.9),  # Chicago area
+  domains = "health_services",
+  geography = "block_group", geometry = TRUE
+)
+
+# Examine disparities
+summary(health_places$pharmacy)
+summary(health_places$healthcare)
+```
+
+#### Use Case 4: Physical Activity and Recreation
+Study outdoor recreation access:
+
+```r
+# Get parks and fitness facilities
+activity <- get_places(
+  state = "CO", county = "Denver",
+  domains = "physical_activity",
+  geography = "tract", geometry = TRUE
+)
+
+# Calculate 10-minute accessibility
+activity_access <- calc_access(
+  activity, population = pop,
+  catchment = 10/60  # 10 minutes straight-line distance
+)
+```
+
+#### Use Case 5: Comprehensive Community Assessment
+Analyze multiple health determinants simultaneously:
+
+```r
+# Get food, health, and social resources
+community <- get_places(
+  state = "MA", county = "Suffolk",
+  domains = c("food_environment", "health_services", "social_environment"),
+  geography = "block_group", geometry = TRUE
+)
+
+# Create accessibility scores for each domain
+pop <- data.frame(geoid = acs$GEOID, population = acs$estimate)
+community_access <- calc_access(community, population = pop, catchment = 1.5)
+
+# Map multiple domains
+map_places(community_access, "grocery")
+map_places(community_access, "pharmacy")
+map_places(community_access, "library")
+```
+
+### Domain Filtering Features
+
+- **Case-insensitive**: `"Food Environment"`, `"food_environment"`, and
+  `"food-environment"` all work the same way.
+- **Flexible input**: Whitespace and punctuation are normalized automatically.
+- **Precedence**: When both `tags` and `domains` are specified, `domains` takes
+  precedence.
+- **Backward compatible**: The `tags` parameter works exactly as before when
+  `domains` is not specified.
+- **Same output**: Results have identical structure to tag-based queries—one
+  column per place type, same column naming.
+
 ## Taxonomy
 
 The bundled taxonomy is exposed by `places_taxonomy()` and covers the following
